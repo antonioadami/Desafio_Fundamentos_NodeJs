@@ -12,16 +12,6 @@ interface CreateAppointmentDTO {
   type: 'income' | 'outcome';
 }
 
-const incomeReducer = (acc: Transaction, cur: Transaction) => {
-  if (cur.type === 'income') acc.value += cur.value;
-  return acc;
-};
-
-const outcomeReducer = (acc: Transaction, cur: Transaction) => {
-  if (cur.type === 'outcome') acc.value += cur.value;
-  return acc;
-};
-
 class TransactionsRepository {
   private transactions: Transaction[];
 
@@ -34,17 +24,32 @@ class TransactionsRepository {
   }
 
   public getBalance(): Balance {
-    const incomeTransactions = this.transactions.reduce(incomeReducer);
-    const outcomeTransactions = this.transactions.reduce(outcomeReducer);
+    const balance = this.transactions.reduce(
+      (acc: Balance, transaction: Transaction) => {
+        switch (transaction.type) {
+          case 'income':
+            acc.income += transaction.value;
+            break;
 
-    const balance: Balance = {
-      income: incomeTransactions.value,
-      outcome: outcomeTransactions.value,
-      total: incomeTransactions.value - outcomeTransactions.value,
-    };
+          case 'outcome':
+            acc.outcome += transaction.value;
+            break;
+
+          default:
+            break;
+        }
+        return acc;
+      },
+      {
+        income: 0,
+        outcome: 0,
+        total: 0,
+      },
+    );
+
+    balance.total = balance.income - balance.outcome;
 
     return balance;
-    // TODO
   }
 
   public create({ title, type, value }: CreateAppointmentDTO): Transaction {

@@ -13,7 +13,7 @@ const createTransactionService = new CreateTransactionService(
 
 const getTransactionService = new GetTransactionService(transactionsRepository);
 
-transactionRouter.get('/transactions', (request, response) => {
+transactionRouter.get('/', (request, response) => {
   try {
     const transactions = getTransactionService.execute();
     return response.status(200).json(transactions);
@@ -22,7 +22,7 @@ transactionRouter.get('/transactions', (request, response) => {
   }
 });
 
-transactionRouter.post('/transactions', (request, response) => {
+transactionRouter.post('/', (request, response) => {
   try {
     const { title, value, type } = request.body;
     const transaction = createTransactionService.execute({
