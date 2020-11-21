@@ -15,6 +15,12 @@ class CreateTransactionService {
   }
 
   public execute({ title, type, value }: Request): Transaction {
+    const balance = this.transactionsRepository.getBalance();
+
+    if (type === 'outcome' && value > balance.total) {
+      throw Error('Não é possível retirar mais do que tem na conta');
+    }
+
     return this.transactionsRepository.create({ title, type, value });
   }
 }
